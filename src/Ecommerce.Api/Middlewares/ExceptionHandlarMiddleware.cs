@@ -99,7 +99,7 @@ namespace Ecommerce.Api.Middlewares
             .AppendFormat("\n  User-Agent     :").Append(httpContext.Request.Headers["User-Agent"].ToString())
             .AppendFormat("\n  Error Message  :").Append(exception.Message);
 
-            logger.Log(logLevel, exception, customeDetails.ToString());
+            logger.Log(logLevel, exception, customeDetails.ToString()); // Here we log the error
 
             if (httpContext.Response.HasStarted)
             {
