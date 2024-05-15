@@ -69,7 +69,7 @@ namespace Ecommerce.Api.Middlewares
            HttpContext httpContext,
            HttpStatusCode httpStatusCode,
            LogLevel logLevel,
-           string alternateMessage = null)
+           string? alternateMessage = null)
         {
             string requestBody = string.Empty;
             if (httpContext.Request.Body.CanSeek && httpContext.Request.Body.Length > 0)
@@ -91,12 +91,12 @@ namespace Ecommerce.Api.Middlewares
             .AppendFormat("\n  Request Method :").Append(httpContext.Request?.Method)
             .AppendFormat("\n  Request Body   :").Append(requestBody)
             .AppendFormat("\n  Authorization  :").Append(authorization)
-            .AppendFormat("\n  Content-Type   :").Append(httpContext.Request.Headers["Content-Type"].ToString())
-            .AppendFormat("\n  Cookie    	  :").Append(httpContext.Request.Headers["Cookie"].ToString())
-            .AppendFormat("\n  Host      	  :").Append(httpContext.Request.Headers["Host"].ToString())
-            .AppendFormat("\n  Referer        :").Append(httpContext.Request.Headers["Referer"].ToString())
-            .AppendFormat("\n  Origin    	  :").Append(httpContext.Request.Headers["Origin"].ToString())
-            .AppendFormat("\n  User-Agent     :").Append(httpContext.Request.Headers["User-Agent"].ToString())
+            .AppendFormat("\n  Content-Type   :").Append(httpContext.Request?.Headers["Content-Type"].ToString())
+            .AppendFormat("\n  Cookie    	  :").Append(httpContext.Request?.Headers["Cookie"].ToString())
+            .AppendFormat("\n  Host      	  :").Append(httpContext.Request?.Headers["Host"].ToString())
+            .AppendFormat("\n  Referer        :").Append(httpContext.Request?.Headers["Referer"].ToString())
+            .AppendFormat("\n  Origin    	  :").Append(httpContext.Request?.Headers["Origin"].ToString())
+            .AppendFormat("\n  User-Agent     :").Append(httpContext.Request?.Headers["User-Agent"].ToString())
             .AppendFormat("\n  Error Message  :").Append(exception.Message);
 
             logger.Log(logLevel, exception, customeDetails.ToString()); // Here we log the error

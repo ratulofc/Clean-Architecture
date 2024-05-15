@@ -43,7 +43,6 @@ namespace Ecommerce.Api.V1.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetById(int id)
         {
-            throw new NotFoundException("NEW ERROR");
             if (id <= 0) return BadRequest();
             var result = await this.userService.GetById(id);
             if (result is not null) return Ok(result);
