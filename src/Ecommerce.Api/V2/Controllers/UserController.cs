@@ -8,13 +8,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Ecommerce.Api.V1.Controllers
+namespace Ecommerce.Api.V2.Controllers
 {
     //[Route("api/[controller]")]
     [ApiController]
-    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Route("api/" + ApiConstants.ServiceName + "/v{api-version:apiVersion}/[controller]")]
-    
+
     public class UserController : ControllerBase
     {
         private readonly IUserService userService;
@@ -75,36 +75,6 @@ namespace Ecommerce.Api.V1.Controllers
             var result = await this.userService.Add(userRequest);
             if (result is null) return BadRequest(new { message = "User already exiest in database" });
             return Ok(result);
-        }
-
-        [HttpPut]
-        [Route("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UserRequest userRequest)
-        {
-            if (id <= 0) return BadRequest();
-            var result = await this.userService.Update(id, userRequest);
-            if (result is not null) return Ok(result);
-            return NotFound(new { message = $"Entity with ID => {id} Not Found" });
-        }
-
-        [HttpPatch]
-        [Route("{id}")]
-        public async Task<IActionResult> UpdatePatch(int id, [FromBody] JsonPatchDocument<User> userRequest)
-        {
-            if (id <= 0) return BadRequest();
-            var result = await this.userService.UpdatePatch(id, userRequest);
-            if (result is not null) return Ok(result);
-            return NotFound(new { message = $"Entity with ID => {id} Not Found" });
-        }
-
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            if (id <= 0) return BadRequest();
-            var result = await this.userService.Delete(id);
-            if (result) return Ok(new { message = $"Entity with ID => {id} Deleted" });
-            return NotFound(new { message = $"Entity with ID => {id} Not Found" });
         }
     }
 }

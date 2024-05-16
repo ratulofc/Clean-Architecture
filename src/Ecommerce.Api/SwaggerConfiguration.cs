@@ -1,4 +1,8 @@
-﻿using Microsoft.OpenApi.Models;
+﻿//using Asp.Versioning;
+//using Asp.Versioning.ApiExplorer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.OpenApi.Models;
 using System.Reflection;
 
 namespace Ecommerce.Api
@@ -11,26 +15,48 @@ namespace Ecommerce.Api
             {
                 throw new ArgumentNullException(nameof(services));
             }
+            services.AddVersionedApiExplorer(options =>
+            {
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.DefaultApiVersion = new ApiVersion(1, 0);
+                options.GroupNameFormat = "'v'VVV";
+                options.SubstituteApiVersionInUrl = true;
+            });
+
+            services.AddApiVersioning(options =>
+            {
+                options.ReportApiVersions = true;
+                options.AssumeDefaultVersionWhenUnspecified = true;
+            });
+
             string serviceDescription = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "ServiceDescription.md"));
+
             services.AddSwaggerGen(options =>
             {
-                options.SwaggerDoc("V1", new OpenApiInfo { 
-                    Title = "Ecommerce",
-                    Version = "V1", 
-                    Description = serviceDescription, 
-                    TermsOfService = new Uri("https://example.com/terms"), 
-                    Contact = new OpenApiContact 
+                var provider = services.BuildServiceProvider().GetRequiredService<IApiVersionDescriptionProvider>();
+
+                foreach (var description in provider.ApiVersionDescriptions)
+                {
+                    options.SwaggerDoc(description.GroupName, new OpenApiInfo
                     {
-                        Name = "Ecommerce",
-                        Email = "contact@email.com",
-                        Url = new Uri("https://example.com/terms")
-                    },
-                    License = new OpenApiLicense
-                    {
-                        Name = "Ecommerce",
-                        Url = new Uri("https://example.com/terms")
-                    }
-                });
+                        Title = $"Ecommerce {description.ApiVersion}",
+                        Version = description.ApiVersion.ToString(),
+                        Description = serviceDescription,
+                        TermsOfService = new Uri("https://example.com/terms"),
+                        Contact = new OpenApiContact
+                        {
+                            Name = "Ecommerce",
+                            Email = "contact@email.com",
+                            Url = new Uri("https://example.com/terms")
+                        },
+                        License = new OpenApiLicense
+                        {
+                            Name = "Ecommerce",
+                            Url = new Uri("https://example.com/terms")
+                        }
+                    });
+                }
+
                 string xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 
@@ -46,8 +72,18 @@ namespace Ecommerce.Api
             {
                 throw new ArgumentNullException(nameof(app));
             }
+
             app.UseSwagger();
-            app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/V1/swagger.json", "Ecommerce V1"));
+
+            app.UseSwaggerUI(options =>
+            {
+                var provider = app.ApplicationServices.GetRequiredService<IApiVersionDescriptionProvider>();
+
+                foreach (var description in provider.ApiVersionDescriptions)
+                {
+                    options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", $"Ecommerce {description.GroupName.ToUpperInvariant()}");
+                }
+            });
 
             return app;
         }
